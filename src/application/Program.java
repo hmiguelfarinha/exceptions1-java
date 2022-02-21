@@ -6,28 +6,27 @@ import java.util.Date;
 import java.util.Scanner;
 
 import model.entitites.Reservation;
+import model.exeptions.DomainException;
 
 public class Program {
 
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) {
 		
 		//solução 1 - muito má!! lógica de validação no programa principal
 		
 		Scanner sc = new Scanner(System.in);
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		
-		System.out.print("Room number: ");
-		int number = sc.nextInt();
-		System.out.print("Check-in date (DD/MM/YYYY): ");
-		Date checkIn = sdf.parse(sc.next()); // pode gerar uma parse exception, quando se adiciona no main a excecao estamos a dizer que o metodo aceita a excecao e pode haver propagação
-											// A solução para nao acrescentar ao main é tratar a excecao por exemplo com o try catch
-		System.out.print("Check-out date (DD/MM/YYYY): ");
-		Date checkOut = sdf.parse(sc.next());
+		try {
+			System.out.print("Room number: ");
+			int number = sc.nextInt();
+			System.out.print("Check-in date (DD/MM/YYYY): ");
+			Date checkIn = sdf.parse(sc.next()); 
+												
+			System.out.print("Check-out date (DD/MM/YYYY): ");
+			Date checkOut = sdf.parse(sc.next());
+			
 		
-		if(!checkOut.after(checkIn)) {
-			System.out.println("Error in reservation: Check-out date must be after check-in date");
-		}
-		else {
 			Reservation reservation = new Reservation(number, checkIn, checkOut);
 			System.out.println("Reservation: " + reservation);
 			System.out.println();
@@ -38,16 +37,15 @@ public class Program {
 			System.out.print("Check-out date (DD/MM/YYYY): ");
 			checkOut = sdf.parse(sc.next());
 			
-			String error = reservation.updateDates(checkIn, checkOut); // recebe o resevation.updaDates para a String error para saber se deu erro ou não 
-			if (error != null) { // teste se a String do error deu erro ou não 
-				System.out.println("Error in reservation: " + error); //mostra o erro
-			}
-				else {
-			System.out.println("Reservation: " + reservation); //não deu erro e mostra o update da reserva
-			}
-		
+			reservation.updateDates(checkIn, checkOut); 
+			System.out.println("Reservation: " + reservation); 
 		}
-		
+		catch(ParseException e) {
+			System.out.println("Invalid date format");
+		}
+		catch (DomainException e) {
+			System.out.println("Error in reservation: " + e.getMessage()); //se der exceçao ele vai buscar a messagem escrita no método através do getMesage
+		}
 		sc.close();
 	}
 }

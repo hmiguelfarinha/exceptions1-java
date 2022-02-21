@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import model.exeptions.DomainException;
+
 public class Reservation {
 
 	private Integer roomNumber;
@@ -13,6 +15,9 @@ public class Reservation {
 	private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // colocado o static para que não seja instânciado um novo SimpleDateFormat para cada objeto Reservation que a aplicação tiver
 	
 	public Reservation(Integer roomNumber, Date checkIn, Date checkOut) {
+		if(!checkOut.after(checkIn)) {
+			throw new DomainException("Check-out date must be after check-in date"); //instanciada execação do java que é usada quando os argumentos que se passa para um método são inválidos
+		}
 		this.roomNumber = roomNumber;
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
@@ -39,17 +44,16 @@ public class Reservation {
 		return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 	}
 	
-	public String updateDates(Date checkIn, Date checkOut) {
+	public void updateDates(Date checkIn, Date checkOut) {
 		Date now = new Date();
 		if(checkIn.before(now) || checkOut.before(now)) {
-			return "Reservation dates for update must be future dates";
+			throw new DomainException("Reservation dates for update must be future dates"); //instanciada execação do java que é usada quando os argumentos que se passa para um método são inválidos
 		}
 		if(!checkOut.after(checkIn)) {
-			return "Check-out date must be after check-in date";
+			throw new DomainException("Check-out date must be after check-in date"); //instanciada execação do java que é usada quando os argumentos que se passa para um método são inválidos
 		}
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
-		return null; // se retorna null significa que não deu nenhum erro
 	}
 	
 	@Override
